@@ -4,10 +4,10 @@
 Dere skal jobbe i tverrfaglige grupper (Dataanalytiker og Anvendt maskinlæring) og løse en felles case.
 
 **High level beskrivelse:**
-![alt text](image.png)
+![alt text](Images/image.png)
 
 **Eksempl på agent work flow:**
-![alt text](image-1.png)
+![alt text](Images/image-1.png)
 ## Oppgavebeskrivelse
 Fagskolen Viken ønsker et KI-basert program som har kunnskap om alle studiene de tilbyr. Programmet skal kunne:
 - svare på spørsmål om studietilbud og innhold (for nyansatte og veiledere)

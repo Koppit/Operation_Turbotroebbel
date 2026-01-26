@@ -3,10 +3,11 @@ from get_studies import get_urls
 """
 This is main
 """
-if __name__ == "__main__":
 
-    urls = get_urls()
-    for url in urls:
-        print(url)
+import DataExtractor
 
 
+
+url = "https://fagskolen-viken.no/studier/ledelse/administrativ-koordinator"
+url = "https://fagskolen-viken.no/studier/ledelse/praktisk-lederutdanning"
+DataExtractor.extract(url)

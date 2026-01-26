@@ -5,6 +5,7 @@ Outputs result as JSON showing the data structure.
 """
 
 import json
+from pathlib import Path
 import pandas as pd
 from bs4 import BeautifulSoup
 from typing import Dict, List, Optional, Any
@@ -39,7 +40,7 @@ class StudyDataExtractor:
             if element:
                 if attribute:
                     return element.get(attribute)
-                return element.get_text(strip=True)
+                return element.get_text(separator=" | ",strip=True)
             return None
         except Exception:
             return None
@@ -49,7 +50,7 @@ class StudyDataExtractor:
         try:
             heading = None
             for h in self.soup.find_all(['h2', 'h3']):
-                if h.get_text(strip=True) == heading_text:
+                if h.get_text(separator=" | ",strip=True) == heading_text:
                     heading = h
                     break
             
@@ -61,7 +62,7 @@ class StudyDataExtractor:
                 if el.name in ['h2', 'h3'] and el != heading:
                     break
                 if el.name in ['p']:
-                    text = el.get_text(strip=True)
+                    text = el.get_text(separator=" | ",strip=True)
                     if text:
                         parts.append(text)
             
@@ -81,7 +82,7 @@ class StudyDataExtractor:
                 course_points = link.select_one('.study-course__points')
                 course_url = link.get('href')
                 
-                course_points_Int = course_points.get_text(separator=" ",strip=True).split(" ")
+                course_points_Int = course_points.get_text(separator=" | ",strip=True).split(" ")
                 
                 #print(course_points_Int)
                 try:
@@ -115,8 +116,8 @@ class StudyDataExtractor:
                                 label = fact_item.select_one('.facts-label')
                                 item = fact_item.select_one('.facts-item')
                                 if label and item:
-                                    label_text = label.get_text(strip=True)
-                                    item_text = item.get_text(strip=True)
+                                    label_text = label.get_text(separator=" | ",strip=True)
+                                    item_text = item.get_text(separator=" | ",strip=True)
                                     
                                     if 'Emnekode' in label_text:
                                         course_id = item_text
@@ -126,22 +127,22 @@ class StudyDataExtractor:
                         # Extract learning outcomes
                         knowledge_elem = course_soup.select_one('div.field-learning-outcome-knowledge.label-above')
                         if knowledge_elem:
-                            learning_outcomes['knowledge'] = knowledge_elem.get_text(strip=True)
+                            learning_outcomes['knowledge'] = knowledge_elem.get_text(separator=" | ",strip=True)
                         
                         skills_elem = course_soup.select_one('div.field-learning-outcome-skills.label-above')
                         if skills_elem:
-                            learning_outcomes['skills'] = skills_elem.get_text(strip=True)
+                            learning_outcomes['skills'] = skills_elem.get_text(separator=" | ",strip=True)
                         
                         competence_elem = course_soup.select_one('div.field-learning-outcome-reflec.label-above')
                         if competence_elem:
-                            learning_outcomes['competence'] = competence_elem.get_text(strip=True)
+                            learning_outcomes['competence'] = competence_elem.get_text(separator=" | ",strip=True)
                     
                     except Exception as e:
                         print(f"  Warning: Error extracting course details from {course_url}: {e}")
 
                 course_dict = {
                     'id': course_id,
-                    'title': course_title.get_text(strip=True) if course_title else None,
+                    'title': course_title.get_text(separator=" | ",strip=True) if course_title else None,
                     'credits': course_points_Int,
                     'url': course_url,
                     'study_level': study_level,
@@ -158,6 +159,7 @@ class StudyDataExtractor:
         study_info = {
             'title': None,
             'description': None,
+            'study_location': None,
             'credits': None,
             'language': None,
             'level': None,
@@ -174,23 +176,34 @@ class StudyDataExtractor:
         try:
             # Title
             title_elem = self.soup.select_one('.study-detail__title')
-            study_info['title'] = title_elem.get_text(strip=True) if title_elem else None
+            study_info['title'] = title_elem.get_text(separator=" | ",strip=True) if title_elem else None
             
             # Description (intro text)
             intro_elem = self.soup.select_one('.study-detail--intro__text')
-            study_info['description'] = intro_elem.get_text(strip=True) if intro_elem else None
+            study_info['description'] = intro_elem.get_text(separator=" | ",strip=True) if intro_elem else None
             
+            # Study Location:
+            location_info = self.soup.select_one('.study-detail--campus__select')
+            study_info['study_location'] = location_info.get_text(separator=" | ",strip=True) if intro_elem else None
+
             # Credits
-            credits_elem = self.soup.select_one('div.field--name-field-study-points .field__item')
-            study_info['credits'] = credits_elem.get_text(strip=True) if credits_elem else None
+            credits_elem = self.soup.select_one('div.field.field--name-field-study-points.field--type-integer.field--label-hidden.field__item')
+            credits_elem = credits_elem.get_text(separator=" | ",strip=True)
+            try:
+                credits_elem_int = int(credits_elem)
+            except ValueError:
+                print(ValueError)
+                credits_elem_int = None
+            
+            study_info['credits'] = credits_elem_int
             
             # Language
-            language_elem = self.soup.select_one('div.field--name-field-language .field__item')
-            study_info['language'] = language_elem.get_text(strip=True) if language_elem else None
+            language_elem = self.soup.select_one('div.field.field--name-field-language.field--type-entity-reference.field--label-hidden.field__item')
+            study_info['language'] = language_elem.get_text(separator=" | ",strip=True) if language_elem else None
             
             # Level
-            level_elem = self.soup.select_one('div.field--name-field-level .field__item')
-            study_info['level'] = level_elem.get_text(strip=True) if level_elem else None
+            level_elem = self.soup.select_one('div.field.field--name-field-level.field--type-entity-reference.field--label-hidden.field__item')
+            study_info['level'] = level_elem.get_text(separator=" | ",strip=True) if level_elem else None
             
             # Why choose this study
             study_info['why_choose'] = self.extract_section_text('Hvorfor velge dette studiet?')
@@ -201,13 +214,13 @@ class StudyDataExtractor:
                 # Try to get from the courses body section
                 courses_body = self.soup.select_one('.study-detail--courses__body')
                 if courses_body:
-                    learn_text = courses_body.get_text(strip=True)
+                    learn_text = courses_body.get_text(separator=" | ",strip=True)
             study_info['what_learn'] = learn_text
             
             # Teaching format and attendance
             teaching_elem = self.soup.select_one('.study-detail--courses__body.other-info')
             if teaching_elem:
-                teaching_text = teaching_elem.get_text(strip=True)
+                teaching_text = teaching_elem.get_text(separator=" | ",strip=True)
                 # Extract teaching format
                 if 'nettbasert deltid' in teaching_text.lower():
                     study_info['teaching_format'] = 'Nettbasert deltid med fysiske samlinger'
@@ -215,12 +228,12 @@ class StudyDataExtractor:
             
             # Career opportunities
             skills_elem = self.soup.select_one('div.field--name-field-skills-jobs')
-            study_info['career_opportunities'] = skills_elem.get_text(strip=True) if skills_elem else None
+            study_info['career_opportunities'] = skills_elem.get_text(separator=" | ",strip=True) if skills_elem else None
             
             # Contact info
             contact_elem = self.soup.select_one('.study-detail--questions')
             if contact_elem:
-                contact_text = contact_elem.get_text(strip=True)
+                contact_text = contact_elem.get_text(separator=" | ",strip=True)
                 study_info['contact_info'] = contact_text
             
             # Study URL (from meta)
@@ -229,7 +242,7 @@ class StudyDataExtractor:
                 study_info['study_url'] = canonical.get('href')
             
             # Police certificate - check in admission section
-            admission_text = self.soup.get_text(strip=True)
+            admission_text = self.soup.get_text(separator=" | ",strip=True)
             study_info['police_certificate'] = None if 'politiattest' not in admission_text.lower() else 'Sjekk opptakskrav'
             
         except Exception as e:
@@ -246,9 +259,10 @@ class StudyDataExtractor:
         data_structure = {
             'study_programs': [
                 {
-                    'id': None,  # To be assigned by database
+                    'id': study_info['title'] + " - " + str(study_info['credits']),  # To be assigned by database
                     'title': study_info['title'],
                     'description': study_info['description'],
+                    'study_location': study_info['study_location'],
                     'credits': study_info['credits'],
                     'language': study_info['language'],
                     'level': study_info['level'],
@@ -286,10 +300,21 @@ class StudyDataExtractor:
     def to_json(self, output_file: str = 'study_data_structure.json'):
         """Export structured data to JSON file."""
         data = self.structure_for_database()
+        folder = "json_for_processing/"
         
         # Convert None to null in JSON and pretty print
         json_data = json.dumps(data, ensure_ascii=False, indent=2)
         
+        # Define the full path to the file
+        if data['study_programs'][0]['id'] is not None:
+            output_file = folder + data['study_programs'][0]['id'] + ".json"
+        else:
+            output_file = folder + output_file
+        
+        output_file = Path(output_file)
+        # sjekk om mappe eksisterer, hvis ikke opprett.
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+
         try:
             with open(output_file, 'w', encoding='utf-8') as f:
                 f.write(json_data)
@@ -315,10 +340,7 @@ class StudyDataExtractor:
         
         return study_df, courses_df
 
-url = "https://fagskolen-viken.no/studier/ledelse/administrativ-koordinator"
-
-# Main execution
-if __name__ == "__main__":
+def extract(url):
     # Fetch HTML from the URL
     try:
         print(f"Fetching data from URL: {url}")
