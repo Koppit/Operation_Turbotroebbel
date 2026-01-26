@@ -7,31 +7,28 @@ Outputs result as JSON showing the data structure.
 import json
 import pandas as pd
 from bs4 import BeautifulSoup
-from pathlib import Path
 from typing import Dict, List, Optional, Any
+from urllib.request import Request, urlopen
+
 
 class StudyDataExtractor:
     """Extract and structure study program information from HTML."""
     
-    def __init__(self, html_file_path: str):
-        """Initialize with HTML file path."""
-        self.html_file = html_file_path
+    def __init__(self, html_content: str):
+        """Initialize with HTML content."""
+        self.html_content = html_content
         self.soup = None
         self.study_data = {}
         self.courses_data = []
+        self.parse_html()
         
-    def load_html(self):
-        """Load and parse HTML file."""
+    def parse_html(self):
+        """Parse HTML content."""
         try:
-            with open(self.html_file, 'r', encoding='utf-8') as f:
-                html_content = f.read()
-            self.soup = BeautifulSoup(html_content, 'html.parser')
-            print(f"✓ HTML file loaded successfully")
-        except FileNotFoundError:
-            print(f"✗ HTML file not found: {self.html_file}")
-            return False
+            self.soup = BeautifulSoup(self.html_content, 'html.parser')
+            print("✓ HTML content parsed successfully")
         except Exception as e:
-            print(f"✗ Error loading HTML: {e}")
+            print(f"✗ Error parsing HTML: {e}")
             return False
         return True
     
@@ -73,7 +70,7 @@ class StudyDataExtractor:
             return None
     
     def extract_courses(self) -> List[Dict[str, Any]]:
-        """Extract course/subject information."""
+        """Extract course/subject information from course pages."""
         courses = []
         try:
             # Find course links
@@ -84,16 +81,71 @@ class StudyDataExtractor:
                 course_points = link.select_one('.study-course__points')
                 course_url = link.get('href')
                 
+                course_points_Int = course_points.get_text(separator=" ",strip=True).split(" ")
+                
+                #print(course_points_Int)
+                try:
+                    course_points_Int = int(course_points_Int[0])
+                except ValueError:
+                    print(ValueError)
+                    course_points_Int = None
+
+                # Extract course details from the course page
+                course_id = None
+                study_level = None
+                learning_outcomes = {
+                    'knowledge': None,
+                    'skills': None,
+                    'competence': None
+                }
+                
+                # Fetch course page to extract additional info
+                if course_url:
+                    try:
+                        req = Request(course_url, headers={"User-Agent": "Mozilla/5.0"})
+                        course_html = urlopen(req).read().decode("utf-8", errors="ignore")
+                        course_soup = BeautifulSoup(course_html, 'html.parser')
+                        
+                        # Extract course ID (Emnekode) from facts container
+                        facts_container = course_soup.select_one('div#facts-containter')
+                        if facts_container:
+                            # Find all facts and look for Emnekode
+                            facts_items = facts_container.find_all('li')
+                            for fact_item in facts_items:
+                                label = fact_item.select_one('.facts-label')
+                                item = fact_item.select_one('.facts-item')
+                                if label and item:
+                                    label_text = label.get_text(strip=True)
+                                    item_text = item.get_text(strip=True)
+                                    
+                                    if 'Emnekode' in label_text:
+                                        course_id = item_text
+                                    elif 'Studienivå' in label_text:
+                                        study_level = item_text
+                        
+                        # Extract learning outcomes
+                        knowledge_elem = course_soup.select_one('div.field-learning-outcome-knowledge.label-above')
+                        if knowledge_elem:
+                            learning_outcomes['knowledge'] = knowledge_elem.get_text(strip=True)
+                        
+                        skills_elem = course_soup.select_one('div.field-learning-outcome-skills.label-above')
+                        if skills_elem:
+                            learning_outcomes['skills'] = skills_elem.get_text(strip=True)
+                        
+                        competence_elem = course_soup.select_one('div.field-learning-outcome-reflec.label-above')
+                        if competence_elem:
+                            learning_outcomes['competence'] = competence_elem.get_text(strip=True)
+                    
+                    except Exception as e:
+                        print(f"  Warning: Error extracting course details from {course_url}: {e}")
+
                 course_dict = {
+                    'id': course_id,
                     'title': course_title.get_text(strip=True) if course_title else None,
-                    'credits': course_points.get_text(strip=True) if course_points else None,
+                    'credits': course_points_Int,
                     'url': course_url,
-                    'study_level': None,  # To be extracted from course page if available
-                    'learning_outcomes': {
-                        'knowledge': None,
-                        'skills': None,
-                        'competence': None
-                    }
+                    'study_level': study_level,
+                    'learning_outcomes': learning_outcomes
                 }
                 courses.append(course_dict)
         except Exception as e:
@@ -263,18 +315,26 @@ class StudyDataExtractor:
         
         return study_df, courses_df
 
+url = "https://fagskolen-viken.no/studier/ledelse/administrativ-koordinator"
 
 # Main execution
 if __name__ == "__main__":
-    # Path to HTML file
-    html_file_path = "Administrativ koordinator.html"
+    # Fetch HTML from the URL
+    try:
+        print(f"Fetching data from URL: {url}")
+        req = Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        html_content = urlopen(req).read().decode("utf-8", errors="ignore")
+        print("✓ Data fetched successfully from URL\n")
+    except Exception as e:
+        print(f"✗ Error fetching URL: {e}")
+        exit(1)
     
-    # Initialize extractor
-    extractor = StudyDataExtractor(html_file_path)
+    # Initialize extractor with HTML content
+    extractor = StudyDataExtractor(html_content)
     
     # Load and process
-    if extractor.load_html():
-        print("\nExtracting study data...")
+    if extractor.soup:
+        print("Extracting study data...")
         extractor.display_dataframes_summary()
         
         print("\n" + "="*70)
