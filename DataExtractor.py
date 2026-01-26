@@ -315,10 +315,7 @@ class StudyDataExtractor:
         
         return study_df, courses_df
 
-url = "https://fagskolen-viken.no/studier/ledelse/administrativ-koordinator"
-
-# Main execution
-if __name__ == "__main__":
+def extract(url):
     # Fetch HTML from the URL
     try:
         print(f"Fetching data from URL: {url}")

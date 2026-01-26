@@ -3,5 +3,10 @@
 This is main
 """
 
-print("Not yet implemented")
-# Tests
+import DataExtractor
+
+
+
+url = "https://fagskolen-viken.no/studier/ledelse/administrativ-koordinator"
+
+DataExtractor.extract(url)
