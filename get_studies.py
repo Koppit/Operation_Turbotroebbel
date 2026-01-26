@@ -4,7 +4,7 @@ import time
 import json
 
 
-buffer_file = r"2026_V-r_Samling_1/studies_urls.json"
+buffer_file = r"studies_urls.json"
 """
 les ut alle nettside linkene til studiene ved fagskolen
 """
