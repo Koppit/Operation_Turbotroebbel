@@ -127,15 +127,15 @@ class StudyDataExtractor:
                         # Extract learning outcomes
                         knowledge_elem = course_soup.select_one('div.field-learning-outcome-knowledge.label-above')
                         if knowledge_elem:
-                            learning_outcomes['knowledge'] = knowledge_elem.get_text(separator=" | ",strip=True)
+                            learning_outcomes['knowledge'] = knowledge_elem.get_text(separator=" ",strip=True)
                         
                         skills_elem = course_soup.select_one('div.field-learning-outcome-skills.label-above')
                         if skills_elem:
-                            learning_outcomes['skills'] = skills_elem.get_text(separator=" | ",strip=True)
+                            learning_outcomes['skills'] = skills_elem.get_text(separator=" ",strip=True)
                         
                         competence_elem = course_soup.select_one('div.field-learning-outcome-reflec.label-above')
                         if competence_elem:
-                            learning_outcomes['competence'] = competence_elem.get_text(separator=" | ",strip=True)
+                            learning_outcomes['competence'] = competence_elem.get_text(separator=" ",strip=True)
                     
                     except Exception as e:
                         print(f"  Warning: Error extracting course details from {course_url}: {e}")
@@ -218,17 +218,18 @@ class StudyDataExtractor:
             study_info['what_learn'] = learn_text
             
             # Teaching format and attendance
+            #TODO: Skal denne fjernes? Informasjonen står allerede i mandatory_attendance.
             teaching_elem = self.soup.select_one('.study-detail--courses__body.other-info')
             if teaching_elem:
-                teaching_text = teaching_elem.get_text(separator=" | ",strip=True)
+                teaching_text = teaching_elem.get_text(separator=" ",strip=True)
                 # Extract teaching format
                 if 'nettbasert deltid' in teaching_text.lower():
                     study_info['teaching_format'] = 'Nettbasert deltid med fysiske samlinger'
                 study_info['mandatory_attendance'] = teaching_text
-            
+
             # Career opportunities
             skills_elem = self.soup.select_one('div.field--name-field-skills-jobs')
-            study_info['career_opportunities'] = skills_elem.get_text(separator=" | ",strip=True) if skills_elem else None
+            study_info['career_opportunities'] = skills_elem.get_text(separator=" ",strip=True) if skills_elem else None
             
             # Contact info
             contact_elem = self.soup.select_one('.study-detail--questions')
