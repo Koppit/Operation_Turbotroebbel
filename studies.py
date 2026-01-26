@@ -27,5 +27,5 @@ def get_urls():
 
     return urls
 
-
-print(get_urls())
+if __name__ == "__main__": 
+    print(get_urls())
