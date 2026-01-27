@@ -42,3 +42,4 @@ Thumbs.db
 *.log
 .env
 .env.local
+.testing_kyd.py
