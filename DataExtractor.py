@@ -11,6 +11,19 @@ from bs4 import BeautifulSoup
 from typing import Dict, List, Optional, Any
 from urllib.request import Request, urlopen
 
+"""
+study_locations = {
+    0: "Fredrikstad",
+    1: "Kjeller",
+    2: "Kongsberg"
+}
+study_types = {
+    0: "Samlingsbasert 2 år",
+    1: "placeholder"
+}
+"""
+study_locations = {}
+study_types = {}
 
 class StudyDataExtractor:
     """Extract and structure study program information from HTML."""
@@ -159,6 +172,7 @@ class StudyDataExtractor:
             'title': None,
             'description': None,
             'study_location': None,
+            'study_type': None,
             'credits': None,
             'language': None,
             'level': None,
@@ -184,6 +198,21 @@ class StudyDataExtractor:
             # Study Location:
             location_info = self.soup.select_one('.study-detail--campus__select')
             study_info['study_location'] = location_info.get_text(separator=" | ",strip=True) if intro_elem else None
+            
+            study_info['study_location'], study_info['study_type'] = match_location_and_sudyType(study_info['study_location'])
+            
+            """
+            study_info_list = study_info['study_location'].split("|")
+            study_info_json = {}
+            i = 0
+            for location in study_info_list:
+                
+                study_info_json[i] = location.strip()
+                i += 1
+            study_info['study_location'] = study_info_json
+            
+            print(study_info['study_location'])
+            """
 
             # Credits
             credits_elem = self.soup.select_one('div.field.field--name-field-study-points.field--type-integer.field--label-hidden.field__item')
@@ -263,6 +292,7 @@ class StudyDataExtractor:
                     'title': study_info['title'],
                     'description': study_info['description'],
                     'study_location': study_info['study_location'],
+                    'study_type': study_info['study_type'],
                     'credits': study_info['credits'],
                     'language': study_info['language'],
                     'level': study_info['level'],
@@ -340,15 +370,47 @@ class StudyDataExtractor:
         
         return study_df, courses_df
 
+def match_location_and_sudyType(object):
+    object = object.split(sep=" | ") # split ut lokasjonene. Studietype splittes senere.
+    study_location = {}
+    study_type = {}
+    for o in object:
+        object_splitted = o.split(sep="(") # splitt ut lokasjon og studietype 
+
+        # Match lokasjon mot ID i databasen.
+        for loc in study_locations:
+            target = object_splitted[0].strip()
+            
+            #print(f"Prøver å matche '{study_locations[loc]}' mot '{target}'")
+            if study_locations[loc] == target:
+                #print(f"match found at location ID: {loc}, adding..")
+                study_location[loc] = target
+                #print(f"Lokasjon: {target}, plassert som ID: {loc}")
+            else:
+                print(f"lokasjon ikke funnet: {target}")
+        # Match studietype mot ID i databasen.
+        for type in study_types:
+            target = object_splitted[1].replace(")","").strip()
+            
+            print(f"Prøver å matche '{study_types[type]}' mot '{target}'")
+            if study_types[type] == target:
+                print(f"match found at type ID: {type}, adding..")
+                study_type[type] = target
+                #print(f"studietype: {target}, plassert som ID: {type}")
+            else:
+                print(f"studietype ikke funnet: {target}")
+
+    return study_location, study_type
+
 def extract(url):
     # Fetch HTML from the URL
     try:
-        print(f"Fetching data from URL: {url}")
+        #print(f"Fetching data from URL: {url}")
         req = Request(url, headers={"User-Agent": "Mozilla/5.0"})
         html_content = urlopen(req).read().decode("utf-8", errors="ignore")
-        print("✓ Data fetched successfully from URL\n")
+        #print("✓ Data fetched successfully from URL\n")
     except Exception as e:
-        print(f"✗ Error fetching URL: {e}")
+        #print(f"✗ Error fetching URL: {e}")
         exit(1)
     
     # Initialize extractor with HTML content
@@ -356,14 +418,14 @@ def extract(url):
     
     # Load and process
     if extractor.soup:
-        print("Extracting study data...")
+        #print("Extracting study data...")
         extractor.display_dataframes_summary()
         
-        print("\n" + "="*70)
-        print("Exporting to JSON...")
-        print("="*70)
+        #print("\n" + "="*70)
+        #print("Exporting to JSON...")
+        #print("="*70)
         extractor.to_json()
         
-        print("\n✓ Data extraction complete!")
+        #print("\n✓ Data extraction complete!")
 
 # Test commit
