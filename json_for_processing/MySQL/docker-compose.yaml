@@ -1,0 +1,19 @@
+services:
+
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    ports:
+      - "3306:3306" # Map host port 3306 to container port 3306
+      - "33060:33060"
+      - "33061:33061"
+      - "33062:33062"
+    volumes:
+      - db_data:/var/lib/mysql # Persist data in a named volume
+
+volumes:
+  db_data: # Define the named volume for data persistence
