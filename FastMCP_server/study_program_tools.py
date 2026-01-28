@@ -13,6 +13,13 @@ class TableStudyPrograms:
         result = self.conn.query(f"SELECT COUNT(*) FROM {self.table}")
         return result[0][0]
     
+    def get_study_program_categories(self) -> list:
+        """
+        Get a list of the different study program catagories.
+        """
+        results = self.conn.query(f"SELECT DISTINCT study_category FROM {self.table} WHERE study_category IS NOT null")
+        return [result[0] for result in results]
+    
     def get_study_programs_names(self) -> list:
         '''
         Get the name of all the available datafields in the table.
@@ -27,8 +34,8 @@ class TableStudyPrograms:
         Get the names of all the available datafields for a study program.
         """
         results = self.conn.query(f"DESCRIBE {self.table}")
-        results = [result[0] for result in results[2:]]
-        return results
+        return [result[0] for result in results[2:]]
+
 
 
     def get_datafields_values(self, program_name:str, fields: list[str]) -> dict[str,str]:
@@ -62,9 +69,10 @@ if __name__ == "__main__":
         db_conn = DBConnection()
         programs = TableStudyPrograms(db_conn, f"{DATABASE}.{STUDY_PROGRAM_TABLE}")
 
-        #result = programs.get_number_of_study_programs()
-        #result = programs.get_study_programs_names()
-        results = programs.get_datafields()
+        #results = programs.get_number_of_study_programs()
+        results = programs.get_study_program_categories()
+        #results = programs.get_study_programs_names()
+        #results = programs.get_datafields()
         #results = programs.get_datafields_values("Akuttgeriatri", ["location_id", "credits"])
         print(results)
 
