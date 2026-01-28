@@ -15,10 +15,23 @@ class TableStudyPrograms:
     
     def get_study_programs_names(self) -> list:
         '''
-        get the names of all the study programs, returns list of all study program names
+        Get the name of all the available datafields in the table.
+        Returns a list names for all the datafields in the table.
         '''
         result = self.conn.query(f"SELECT study_title FROM {self.table}")
         return [title[0] for title in result]
+    
+
+    def get_datafields(self, program_name:str, fields: list[str]) -> dict[str,str]:
+        '''
+        Returns the values of datafiels for a study program.
+        Two paramterers must be provided.
+        The first parameter is the name of the study program as a string.
+        The Second parameter is a list of the names for the requested datafields as a list of strings.
+        Returns a dictonary with all the datafield names and values.
+        '''
+        result = self.conn.query(f'SELECT {",".join(fields)} FROM {self.table} WHERE study_title = "{program_name}"')
+        return dict(zip(fields,result[0]))
     
 
     '''
@@ -38,12 +51,13 @@ if __name__ == "__main__":
     STUDY_PROGRAM_TABLE = "study_programs"
     try:
         db_conn = DBConnection()
-        courses = TableStudyPrograms(db_conn, f"{DATABASE}.{STUDY_PROGRAM_TABLE}")
+        programs = TableStudyPrograms(db_conn, f"{DATABASE}.{STUDY_PROGRAM_TABLE}")
 
-        result = courses.get_number_of_study_programs()
-        print(result)
-        result = courses.get_study_programs_names()
-        print(result)
+        #result = programs.get_number_of_study_programs()
+        #result = programs.get_study_programs_names()
+        #results = programs.get_datafields()
+        results = programs.get_datafields("Akuttgeriatri", ["location_id", "credits"])
+        print(results)
 
     except mysql.connector.Error as err:
         print(f"Error: {err}")
