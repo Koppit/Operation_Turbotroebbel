@@ -25,6 +25,8 @@ if __name__ == "__main__":
     # add methods as tools for study programs
     mcp.tool(study_programs.get_number_of_study_programs)
     mcp.tool(study_programs.get_study_programs_names)
+    mcp.tool(study_programs.get_datafields)
+    mcp.tool(study_programs.get_datafields_values)
 
     # add methods as tools for courses
     mcp.tool(courses.get_number_of_courses)

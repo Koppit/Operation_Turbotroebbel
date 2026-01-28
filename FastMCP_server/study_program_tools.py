@@ -22,7 +22,16 @@ class TableStudyPrograms:
         return [title[0] for title in result]
     
 
-    def get_datafields(self, program_name:str, fields: list[str]) -> dict[str,str]:
+    def get_datafields(self) -> list[str]:
+        """
+        Get the names of all the available datafields for a study program.
+        """
+        results = self.conn.query(f"DESCRIBE {self.table}")
+        results = [result[0] for result in results[2:]]
+        return results
+
+
+    def get_datafields_values(self, program_name:str, fields: list[str]) -> dict[str,str]:
         '''
         Returns the values of datafiels for a study program.
         Two paramterers must be provided.
@@ -55,8 +64,8 @@ if __name__ == "__main__":
 
         #result = programs.get_number_of_study_programs()
         #result = programs.get_study_programs_names()
-        #results = programs.get_datafields()
-        results = programs.get_datafields("Akuttgeriatri", ["location_id", "credits"])
+        results = programs.get_datafields()
+        #results = programs.get_datafields_values("Akuttgeriatri", ["location_id", "credits"])
         print(results)
 
     except mysql.connector.Error as err:

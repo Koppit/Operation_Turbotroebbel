@@ -21,6 +21,8 @@ retriver_agent = Agent(
     description="Retrives information about the study programs and courses available at Fagskolen i Viken",
     instruction="You are responsible for retriving information about the study programs and courses at Fagskolen i Viken. \
         You can only retrieve the requested information using the provided tools. \
+        Use the get_datafields tool to get the names of the available datafields for a study program. \
+        Use the get_datafields_values tool to get more information about a study. \
         Do not respond to other requests. \
         Return the information in a understandable format for a LLM.",
     tools=[toolset],
