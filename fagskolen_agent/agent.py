@@ -15,13 +15,24 @@ toolset = McpToolset(
     ),
 )
 
+retriver_agent = Agent(
+    model='gemini-2.5-flash',
+    name='retriver_agent',
+    description="Retrives information about the study programs and courses available at Fagskolen i Viken",
+    instruction="You are responsible for retriving information about the study programs and courses at Fagskolen i Viken. \
+        You can only retrieve the requested information using the provided tools. \
+        Do not respond to other requests. \
+        Return the information in a understandable format for a LLM.",
+    tools=[toolset],
+    )
+
 root_agent = Agent(
     model='gemini-2.5-flash',
     name='root_agent',
-    description="Tells the current weather in a specified city.",
-    instruction="You are a helpful assistant that tells current weather or GPS coordiantes for a city. \
-        You can only tell the weather at the moment. You can only tell the GPS coordiantes for a given location or city. \
-        Use the get_coordinates to get GPS coordinates for a location. \
-        Provide the weather tool with GPS coordiantes to get the weather for a city.",
-    tools=[toolset],
+    description="Answers questions from potential students",
+    instruction="You are a helpful assistant that answer questions about Fagskolen i Viken. \
+        You can use the retriver_agent subagent to retrieve information about the study programs and courses at Fagskolen. \
+        Do not answer other qustions.",
+    sub_agents=[retriver_agent],
     )
+
