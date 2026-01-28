@@ -42,5 +42,8 @@ Thumbs.db
 *.log
 .env
 .env.local
-.testing_kyd.py
-Operation_Turbotroebbel/testing_kyd.py
+testing_kyd.py
+check_locations.py
+quick_check.py
+scan_course_ids.py
+requirements.txt
