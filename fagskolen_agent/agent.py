@@ -1,7 +1,5 @@
 from google.adk.agents.llm_agent import Agent
 from google.adk.tools.mcp_tool import McpToolset
-# from google.adk.tools.mcp_tool.connections import StreamableHTTPConnectionParams
-#from mcp.server.streamable_http_manager import StreamableHTTPSessionManager
 from google.adk.tools.mcp_tool.mcp_session_manager import StreamableHTTPConnectionParams
 
 import warnings
