@@ -23,18 +23,35 @@ GEMMA_3_12B = "gemma-3-12b-it"
 GEMMA_3_27B = "gemma-3-27b-it"
 GEMINI_2_5_FLASH = "gemini-2.5-flash"
 
+use_good_models = 1
 
-model_verify     = GEMINI_2_5_FLASH
-model_presenting = GEMINI_2_5_FLASH
-model_retriver   = GEMINI_2_5_FLASH
-model_root       = GEMINI_2_5_FLASH
+if use_good_models == 1:
+    model_verify     = GEMINI_2_5_FLASH
+    model_presenting = GEMINI_2_5_FLASH
+    model_retriver   = GEMINI_2_5_FLASH
+    model_root       = GEMINI_2_5_FLASH
+else:
+    model_verify     = GEMMA_3_12B
+    model_presenting = GEMMA_3_27B
+    model_retriver   = GEMMA_3_4B
+    model_root       = GEMMA_3_1B
 
 Verify_agent = Agent(
     model=model_verify,
     name='Verify_agent',
     description="Verify the incoming information and send ut to the user",
     instruction="Your job is to verify that the question from the user has been answered. \
-        if the question is not answered, refer the user to this website: https://fagskolen-viken.no/ ",
+        **Presenting_text** \
+        {Presenting_text} \
+        \
+        ** Review Comments:** \
+        {verified_information} \
+        \
+        ** Task:** \
+        Look through the presenting text and check for errors, return the corrected information \
+        if the question is not answered, refer the user to this website: https://fagskolen-viken.no/ \
+        Do not use information from the internet to correct the data.",
+    output_key='verified_information'
     )
 
 Presenting_agent = Agent(
@@ -42,14 +59,31 @@ Presenting_agent = Agent(
     name='Presenting_agent',
     description="Go through the data and structure it to be readable for a user.",
     instruction="You are a helpful assistant that structures incoming data to a presentable way for a human. \
-        You will get information from the retriever_agent and structure it for humans to answer their questions.",
+        **Information_from_database** \
+        {Presenting_text} \
+        \
+        **Presenting_text:** \
+        {Presenting_text} \
+        \
+        ** Task:** \
+        Structure the incoming information so that it is easy to read and understand. Use bulletpoints and short text \
+        Do not use information from the internet to correct the data.\
+        ",
+    output_key='Presenting_text'
     )
 
 retriver_agent = Agent(
     model=model_retriver,
     name='retriver_agent',
     description="Retrives information about the study programs and courses available at Fagskolen i Viken",
-    instruction="You are responsible for retriving information about the study programs and courses at Fagskolen i Viken. \
+    instruction="You are responsible for retriving information about the study programs and courses at Fagskolen i Viken.  \
+        **Question_from_user** \
+        {Question_from_user} \
+        \
+        **Information_from_database:** \
+        {Information_from_database} \
+        \
+        ** Task:** \
         You can only retrieve the requested information using the provided tools. \
         Use the get_study_program_categories tool to get the different categories for the study programs. \
         Use the get_study_programs_names to get a complete list of the available study programs. \
@@ -58,16 +92,19 @@ retriver_agent = Agent(
         Do not respond to other requests. \
         Return the information in a understandable format for a LLM and send it to the Presenting_agent subagent",
     tools=[toolset],
+    output_key='Information_from_database'
     )
 
 input_agent = Agent(
     model=model_root,
     name='input_agent',
     description="Understand what the user want and forward the information",
-    instruction="You are a helpful assistant that answer questions about Fagskolen i Viken. \
-        Your job is to structure the message to the retriever_agent subagent and ask for data based on user input. \
+    instruction="Your job is to take input from the user and structure it to get the correct data from other agents.  \
+        ** Task:** \
         Do not answer questions unrelated to Fagskolen i Viken studies and courses. \
-        If you cannot retrieve any information refer the user to this website: https://fagskolen-viken.no/",
+        If the question is unrelated to Fagskolen Viken refer to this website: https://fagskolen-viken.no/ \
+        Do not use information from the internet to correct the data.",
+    output_key= 'Question_from_user'
     )
 
 
