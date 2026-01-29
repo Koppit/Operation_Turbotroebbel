@@ -15,17 +15,18 @@ toolset = McpToolset(
     ),
 )
 
-"""
-- models/gemma-3-1b-it
-- models/gemma-3-4b-it
-- models/gemma-3-12b-it
-- models/gemma-3-27b-it
-"""
+# models
+GEMMA_3_1B = "gemma-3-1b-it"
+GEMMA_3_4B = "gemma-3-4b-it"
+GEMMA_3_12B = "gemma-3-12b-it"
+GEMMA_3_27B = "gemma-3-27b-it"
+GEMINI_2_5_FLASH = "gemini-2.5-flash"
 
-model_verify     = 'gemma-3-12b-it'
-model_presenting = 'gemma-3-27b-it'
-model_retriver   = 'gemma-3-4b-it'
-model_root       = 'gemma-3-1b-it'
+
+model_verify     = GEMINI_2_5_FLASH
+model_presenting = GEMINI_2_5_FLASH
+model_retriver   = GEMINI_2_5_FLASH
+model_root       = GEMINI_2_5_FLASH
 
 Verify_agent = Agent(
     model=model_verify,
