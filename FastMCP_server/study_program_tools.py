@@ -13,17 +13,25 @@ class TableStudyPrograms:
         result = self.conn.query(f"SELECT COUNT(*) FROM {self.table}")
         return result[0][0]
     
-    def get_study_program_categories(self) -> list:
+    def get_study_program_categories(self) -> list[str]:
         """
         Get a list of the different study program catagories.
         """
         results = self.conn.query(f"SELECT DISTINCT study_category FROM {self.table} WHERE study_category IS NOT null")
         return [result[0] for result in results]
     
-    def get_study_programs_names(self) -> list:
+    def get_category_study_programs(self, category:str) -> list[str]:
         '''
-        Get the name of all the available datafields in the table.
-        Returns a list names for all the datafields in the table.
+        Get the name of all the study programs in the category.
+        Returns a list of names for all the study programs in a category.
+        '''
+        result = self.conn.query(f'SELECT study_title FROM {self.table} WHERE study_category = "{category}"')
+        return [title[0] for title in result]
+    
+    def get_study_programs_names(self) -> list[str]:
+        '''
+        Get the name of all the available study programs at Fagskolen i Viken.
+        Returns a list names for all the study programs at Fagskolen i Viken.
         '''
         result = self.conn.query(f"SELECT study_title FROM {self.table}")
         return [title[0] for title in result]
@@ -48,17 +56,16 @@ class TableStudyPrograms:
         '''
         result = self.conn.query(f'SELECT {",".join(fields)} FROM {self.table} WHERE study_title = "{program_name}"')
         return dict(zip(fields,result[0]))
-    
+       
+    '''
+    def get_study_info(self, study_title) -> list:
+        """
+        Get all information about the study. Send the filter search for what you want from the database in the variable course_title
+        """
+        study_title = "'" + study_title + "'"
+        result = self.conn.query(f"SELECT * FROM {self.table} WHERE study_title = {study_title}")
 
-    '''
-    SELECT `COLUMN_NAME` 
-    FROM `INFORMATION_SCHEMA`.`COLUMNS` 
-    WHERE `TABLE_SCHEMA`='fagskolen' 
-    AND `TABLE_NAME`='study_programs';
-    '''
-
-    '''
-    DESCRIBE fagskolen.study_programs;
+        return result
     '''
     
     
@@ -70,10 +77,14 @@ if __name__ == "__main__":
         programs = TableStudyPrograms(db_conn, f"{DATABASE}.{STUDY_PROGRAM_TABLE}")
 
         #results = programs.get_number_of_study_programs()
-        results = programs.get_study_program_categories()
+        #results = programs.get_study_program_categories()
+        results = programs.get_category_study_programs("Helse")
         #results = programs.get_study_programs_names()
         #results = programs.get_datafields()
         #results = programs.get_datafields_values("Akuttgeriatri", ["location_id", "credits"])
+        
+        #results = programs.get_study_info("Anlegg")
+        
         print(results)
 
     except mysql.connector.Error as err:
