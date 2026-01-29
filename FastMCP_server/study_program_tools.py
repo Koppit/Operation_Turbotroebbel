@@ -49,7 +49,14 @@ class TableStudyPrograms:
         result = self.conn.query(f'SELECT {",".join(fields)} FROM {self.table} WHERE study_title = "{program_name}"')
         return dict(zip(fields,result[0]))
     
+    def get_study_info(self, study_title) -> list:
+        """
+        Get all information about the study. Send the filter search for what you want from the database in the variable course_title
+        """
+        study_title = "'" + study_title + "'"
+        result = self.conn.query(f"SELECT * FROM {self.table} WHERE study_title = {study_title}")
 
+        return result
     '''
     SELECT `COLUMN_NAME` 
     FROM `INFORMATION_SCHEMA`.`COLUMNS` 
@@ -70,10 +77,12 @@ if __name__ == "__main__":
         programs = TableStudyPrograms(db_conn, f"{DATABASE}.{STUDY_PROGRAM_TABLE}")
 
         #results = programs.get_number_of_study_programs()
-        results = programs.get_study_program_categories()
+        #results = programs.get_study_program_categories()
         #results = programs.get_study_programs_names()
         #results = programs.get_datafields()
         #results = programs.get_datafields_values("Akuttgeriatri", ["location_id", "credits"])
+        results = programs.get_study_info("Anlegg")
+        
         print(results)
 
     except mysql.connector.Error as err:
