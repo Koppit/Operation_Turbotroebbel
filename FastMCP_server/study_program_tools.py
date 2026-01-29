@@ -13,17 +13,25 @@ class TableStudyPrograms:
         result = self.conn.query(f"SELECT COUNT(*) FROM {self.table}")
         return result[0][0]
     
-    def get_study_program_categories(self) -> list:
+    def get_study_program_categories(self) -> list[str]:
         """
         Get a list of the different study program catagories.
         """
         results = self.conn.query(f"SELECT DISTINCT study_category FROM {self.table} WHERE study_category IS NOT null")
         return [result[0] for result in results]
     
-    def get_study_programs_names(self) -> list:
+    def get_category_study_programs(self, category:str) -> list[str]:
         '''
-        Get the name of all the available datafields in the table.
-        Returns a list names for all the datafields in the table.
+        Get the name of all the study programs in the category.
+        Returns a list of names for all the study programs in a category.
+        '''
+        result = self.conn.query(f"SELECT study_title FROM {self.table} WHERE study_category = {category}")
+        return [title[0] for title in result]
+    
+    def get_study_programs_names(self) -> list[str]:
+        '''
+        Get the name of all the available study programs at Fagskolen i Viken.
+        Returns a list names for all the study programs at Fagskolen i Viken.
         '''
         result = self.conn.query(f"SELECT study_title FROM {self.table}")
         return [title[0] for title in result]
@@ -48,6 +56,7 @@ class TableStudyPrograms:
         '''
         result = self.conn.query(f'SELECT {",".join(fields)} FROM {self.table} WHERE study_title = "{program_name}"')
         return dict(zip(fields,result[0]))
+       
     
     def get_study_info(self, study_title) -> list:
         """
