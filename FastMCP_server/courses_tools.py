@@ -17,7 +17,7 @@ class TableCourses:
         result = self.conn.query(f"SELECT COUNT(*) FROM {self.table}")
         return result[0][0]
     
-    def get_corse_names(self) -> list:
+    def get_course_names(self) -> list:
         '''
         get the names of all the courses, returns list of all course names
         '''
@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
         result = courses.get_number_of_courses()
         print(result)
-        result = courses.get_corse_names()
+        result = courses.get_course_names()
         print(result)
         result = courses.get_course_info("praksis")
         print(result)
