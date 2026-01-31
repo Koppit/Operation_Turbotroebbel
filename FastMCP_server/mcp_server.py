@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     # add methods as tools for courses
     mcp.tool(courses.get_number_of_courses)
-    mcp.tool(courses.get_corse_names)
+    mcp.tool(courses.get_course_names)
     mcp.tool(courses.get_course_info)
 
     asyncio.run(main())
