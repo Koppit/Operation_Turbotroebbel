@@ -39,7 +39,6 @@ CREATE TABLE IF NOT EXISTS study_programs
     career_opportunities TEXT,
     contact_info TEXT,
     study_url TEXT,
-    course_id VARCHAR(20),
 	CONSTRAINT courseID_fk
 		FOREIGN KEY(course_id)
         REFERENCES courses(course_id),
