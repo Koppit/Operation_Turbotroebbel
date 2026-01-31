@@ -139,8 +139,8 @@ def upsert_course(cursor, course: Dict[str, Any]):
 
 def upsert_study_program(cursor, program: Dict[str, Any], location_id: Optional[int]):
     sql = (
-        "INSERT INTO study_programs (study_id, study_title, study_description, study_category, location_id, credits, study_language, study_level, why_choose, learnings, teaching_format, mandatory_attendance, police_certificate, career_opportunities, contact_info, study_url, course_id) "
-        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) "
+        "INSERT INTO study_programs (study_title, study_description, study_category, location_id, credits, study_language, study_level, why_choose, learnings, teaching_format, mandatory_attendance, police_certificate, career_opportunities, contact_info, study_url, course_id) "
+        "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) "
         "ON DUPLICATE KEY UPDATE study_title=VALUES(study_title), study_description=VALUES(study_description), study_category=VALUES(study_category), location_id=VALUES(location_id), credits=VALUES(credits), study_language=VALUES(study_language), study_level=VALUES(study_level), why_choose=VALUES(why_choose), learnings=VALUES(learnings), teaching_format=VALUES(teaching_format), mandatory_attendance=VALUES(mandatory_attendance), police_certificate=VALUES(police_certificate), career_opportunities=VALUES(career_opportunities), contact_info=VALUES(contact_info), study_url=VALUES(study_url), course_id=VALUES(course_id)"
     )
 
@@ -153,7 +153,6 @@ def upsert_study_program(cursor, program: Dict[str, Any], location_id: Optional[
     cursor.execute(
         sql,
         (
-            program.get("id"),
             program.get("title"),
             program.get("description"),
             program.get("study_category"),
@@ -174,10 +173,10 @@ def upsert_study_program(cursor, program: Dict[str, Any], location_id: Optional[
     )
 
 
-def insert_lookup(cursor, study_id: str, course_id: str):
+def insert_lookup(cursor, study_title: str, course_id: str):
     cursor.execute(
-        "INSERT IGNORE INTO lookuptalbe_study_course (study_id, course_id) VALUES (%s, %s)",
-        (study_id, course_id),
+        "INSERT IGNORE INTO lookuptalbe_study_course (study_title, course_id) VALUES (%s, %s)",
+        (study_title, course_id),
     )
 
 
@@ -265,7 +264,7 @@ def main(argv: Optional[List[str]] = None):
                     if not c.get("id"):
                         continue
                     if not args.dry_run:
-                        insert_lookup(cur, p.get("id"), c.get("id"))
+                        insert_lookup(cur, p.get("title"), c.get("id"))
 
         if not args.dry_run and conn:
             conn.commit()

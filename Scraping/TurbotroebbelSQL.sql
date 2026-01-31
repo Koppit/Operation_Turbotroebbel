@@ -23,8 +23,7 @@ CREATE TABLE IF NOT EXISTS study_place
 
 CREATE TABLE IF NOT EXISTS study_programs
 (
-	study_id VARCHAR(200) PRIMARY KEY,
-    study_title VARCHAR(400),
+    study_title VARCHAR(400) PRIMARY KEY,
     study_description VARCHAR(600),
     study_category VARCHAR(300),
     location_id SMALLINT,
@@ -50,12 +49,12 @@ CREATE TABLE IF NOT EXISTS study_programs
 
 CREATE TABLE IF NOT EXISTS lookuptalbe_study_course
 (
-	study_id VARCHAR(200),
+	study_title VARCHAR(400),
     course_id VARCHAR(20),
-    CONSTRAINT study_course_pk PRIMARY KEY (study_id, course_id),
-    CONSTRAINT study_id_fk
-		FOREIGN KEY(study_id)
-        REFERENCES study_programs(study_id),
+    CONSTRAINT study_course_pk PRIMARY KEY (study_title, course_id),
+    CONSTRAINT study_title_fk
+		FOREIGN KEY(study_title)
+        REFERENCES study_programs(study_title),
 	CONSTRAINT course_id_fk
 		FOREIGN KEY(course_id)
         REFERENCES courses(course_id)
