@@ -54,3 +54,4 @@ scan_course_ids.py
 requirements.txt
 fagskolen_agent/.adk/session.db
 e-l/
+Scraping/*.json

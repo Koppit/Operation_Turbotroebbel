@@ -2,16 +2,17 @@ from bs4 import BeautifulSoup
 from urllib.request import Request, urlopen
 import time
 import json
+import os
 
 BASE_URL = "https://fagskolen-viken.no"
 APPENT_FOR_OPPTAK = "f[0]=apent_for_opptak%3A1&"
-buffer_file = r"studies_urls.json"
+FILE = r"studies_urls.json"
 
 """
 leser ut alle nettside linkene til studiene ved fagskolen
 """
 
-def get_urls(use_buffer:bool = False, only_available_studies:bool=True):
+def get_urls(buffer_file: str, use_buffer:bool = False, only_available_studies:bool=True):
     # les url fra buffer
     if use_buffer:
         with open(buffer_file, "r") as file:
@@ -21,7 +22,7 @@ def get_urls(use_buffer:bool = False, only_available_studies:bool=True):
     else:
         urls = scrape_urls(only_available_studies)
         with open(buffer_file, "w") as file:
-            file.write(json.dumps(urls))
+            file.write(json.dumps(urls, indent=4))
         return urls
 
 
@@ -57,7 +58,8 @@ def scrape_urls(only_available_studies:bool) -> list:
     return urls
 
 if __name__ == "__main__":
-    urls = get_urls(use_buffer=True)
+    path = os.path.join(os.path.dirname(__file__))+"\\"
+    urls = get_urls(path + FILE, use_buffer=False)
     print(f"Fagskolen tilbyr {len(urls)} forskejellige studier")
     print(f"{len(urls)} linker funnet")
     for url in urls:

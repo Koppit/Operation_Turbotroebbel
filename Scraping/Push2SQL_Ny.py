@@ -227,7 +227,7 @@ def main(argv: Optional[List[str]] = None):
             programs = data.get("study_programs", []) or []
 
             # Upsert courses
-            for c in courses:
+            for c in course
                 cid = c.get("id")
                 print("  Course:", cid)
                 if not cid:
