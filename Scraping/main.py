@@ -27,5 +27,5 @@ if __name__ == "__main__":
         # vent litt mellom hver forespørsel
         time.sleep(1)
     
-    # skriv data til database
+    # push to database
     main()
