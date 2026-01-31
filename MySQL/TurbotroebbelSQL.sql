@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS study_programs
 	study_id VARCHAR(200) PRIMARY KEY,
     study_title VARCHAR(400),
     study_description VARCHAR(600),
+    study_category VARCHAR(300),
     location_id SMALLINT,
     credits DECIMAL (12, 5),
     study_language VARCHAR(50),
