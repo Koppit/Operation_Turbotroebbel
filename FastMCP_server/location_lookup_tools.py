@@ -12,14 +12,26 @@ class TableStudyProgramLocationLookup:
     
     def get_study_program_location(self, location_id:int) -> str:
         """
-        Get the name of location for a given location_id.
-        Returns a name of locations.
+        One-line: Return the location name for a given location ID.
+
+        Parameters:
+            location_id (int): Unique integer id for the location.
+
+        Returns:
+            dict: {"status":"success"|"not_found"|"error", "result": str|None, "error_message": str (optional)}
+
+        Example:
+            {"status":"success","result":"Drammen campus"}
+            {"status":"error","result": None}
+
+        Notes:
+            - Prefer returning a 'not_found' status when the id exists but no name is found.
         """
         results = self.conn.query(f"SELECT DISTINCT location_name FROM {self.table} WHERE location_id = '{location_id}'")
-        if results:
-            return results[0][0]
-        else:
-            return ""
+        if not results:
+            return {"status":"not_found", "error_message": f"Location ID {location_id} not found"}
+        return {"status":"success", "result": results[0][0]}
+  
     
    
     

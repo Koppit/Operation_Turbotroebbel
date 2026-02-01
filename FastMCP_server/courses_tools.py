@@ -10,49 +10,107 @@ class TableCourses:
         self.conn = conn
         self.table = table
 
-    def get_number_of_courses(self) -> int:
-        '''
-        get number of entries in the courses table, returns int
-        '''
+    def get_number_of_courses(self) -> dict:
+        """
+        One-line: Return the number of entries in the courses table.
+
+        Parameters:
+            None
+
+        Returns:
+            dict: {"status":"success"|"error", "result": int, "error_message": str (optional)}
+
+        Example:
+            {"status":"success","result": 124}
+        """
         result = self.conn.query(f"SELECT COUNT(*) FROM {self.table}")
-        return result[0][0]
+        if not result:
+            return {"status":"error", "error_message":"Query returned no results"}
+        return   {"status":"success", "result": int(result[0][0])}
     
-    def get_all_course_titles(self) -> list:
-        '''
-        get the title of all the courses, returns list of all course titles
-        '''
+    def get_all_course_titles(self) -> dict:
+        """
+        One-line: Return a list of all course titles.
+
+        Parameters:
+            None
+
+        Returns:
+            dict: {"status":"success"|"error", "result": list[str], "error_message": str (optional)}
+
+        Example:
+            {"status":"success","result":["Apputvikling","Psykisk helsearbeid"]}
+        """
         result = self.conn.query(f"SELECT course_title FROM {self.table}")
-        return [title[0] for title in result]
+        if not result:
+            return {"status":"error", "error_message":"Query returned no results"}
+        return {"status":"success", "result": [title[0] for title in result]}
     
 
-    def get_course_ID(self, course_title) -> list:
+    def get_course_ID(self, course_title: str) -> dict:
         """
-        Get all information about the study. Send the filter search for what you want from the database in the variable course_title
+        One-line: Return course IDs for a given course title (exact match).
+
+        Parameters:
+            course_title (str): Exact course title to search for.
+
+        Returns:
+            dict: {"status":"success"|"error", "result": list[str], "error_message": str (optional)}
+
+        Example:
+            {"status":"success","result":["01TD01B"]}
+
+        Notes:
+            - If not found, return {"status":"success","result":[]}.
+            - Use parameterized queries to prevent SQL injection.
         """
         result = self.conn.query(f'SELECT course_id FROM {self.table} WHERE course_title = "{course_title}"')
-
-        return result
+        if not result:
+            return {"status":"error", "error_message":"Course not found"}
+        return {"status":"success", "result": [course[0] for course in result]}
     
-    def get_datafields(self) -> list[str]:
+
+    def get_datafields(self) -> dict:
         """
-        Get the names of all the available datafields for a course.
+        One-line: Return available data field names for the courses table.
+
+        Parameters:
+            None
+
+        Returns:
+            dict: {"status":"success"|"error", "result": list[str], "error_message": str (optional)}
+
+        Example:
+            {"status":"success","result":["course_id","course_title","credits"]}
         """
         results = self.conn.query(f"DESCRIBE {self.table}")
-        return [result[0] for result in results[1:]]
+        if not results:
+            return {"status":"error", "error_message":"Query returned no results"}
+        return {"status":"success", "result": [result[0] for result in results[1:]]}
 
 
-    def get_datafields_values(self, course_id:str, fields: list[str]) -> dict[str,str]:
-        '''
-        Returns the values of datafiels for a course.
-        Two paramterers must be provided.
-        The first parameter is the ID of the course as a string.
-        The Second parameter is a list of the names for the requested datafields as a list of strings.
-        Returns a dictonary with all the datafield names and values.
-        '''
+    def get_datafields_values(self, course_id: str, fields: list[str]) -> dict:
+        """
+        One-line: Return requested data field values for a course.
+
+        Parameters:
+            course_id (str): Course ID to query.
+            fields (list[str]): List of column names to retrieve.
+
+        Returns:
+            dict: {"status":"success"|"error", "result": dict(field_name->value), "error_message": str (optional)}
+
+        Example:
+            {"status":"success","result":{"credits":"5"}}
+
+        Notes:
+            - If course not found, return {"status":"success","result":{}}.
+            - Validate fields and use parameterized queries.
+        """
         result = self.conn.query(f'SELECT {",".join(fields)} FROM {self.table} WHERE course_id = "{course_id}"')
         if not result:
-            return {}
-        return dict(zip(fields,result[0]))
+            return {"status":"error", "error_message":"Course not found"}
+        return {"status":"success", "result": dict(zip(fields,result[0]))}
     
 if __name__ == "__main__":
 

@@ -1,3 +1,25 @@
+"""
+MCP server exposing Fagskolen i Viken database query tools.
+
+Purpose:
+    Provide tools for agent workflows to query study programs, courses, course
+    lookups and locations. All tools return JSON-serializable dicts of the
+    form: {"status": "success"|"error"|"not_found", "result": ..., "error_message": ...}.
+
+Exposed tools (examples):
+    - get_study_program_categories
+    - get_study_programs_names
+    - get_category_study_programs
+    - get_datafields / get_datafields_values
+    - get_all_course_titles / get_course_ID / get_datafields_values
+    - get_study_program_courseIDs
+    - get_study_program_location
+
+Notes:
+    - Tools should validate inputs and avoid returning non-JSON types.
+    - Ensure parameterized queries are used to prevent SQL injection.
+"""
+
 from fastmcp import FastMCP
 import asyncio
 from database_connection import DBConnection
@@ -5,10 +27,6 @@ from study_program_tools import TableStudyPrograms
 from courses_tools import TableCourses
 from courseid_lookup_tools import TableStudyCoursesLookup
 from location_lookup_tools import TableStudyProgramLocationLookup
-
-"""
-MCP server with the tools for the Agent to retrive data from the database.
-"""
 
 DATABASE = "fagskolen"
 STUDY_PROGRAM_TABLE = "study_programs"
