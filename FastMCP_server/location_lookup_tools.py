@@ -27,10 +27,13 @@ class TableStudyProgramLocationLookup:
         Notes:
             - Prefer returning a 'not_found' status when the id exists but no name is found.
         """
-        results = self.conn.query(f"SELECT DISTINCT location_name FROM {self.table} WHERE location_id = '{location_id}'")
-        if not results:
-            return {"status":"not_found", "error_message": f"Location ID {location_id} not found"}
-        return {"status":"success", "result": results[0][0]}
+        try:
+            results = self.conn.query(f"SELECT DISTINCT location_name FROM {self.table} WHERE location_id = '{location_id}'")
+            if not results:
+                return {"status":"not_found", "error_message": f"Location ID {location_id} not found"}
+            return {"status":"success", "result": results[0][0]}
+        except mysql.connector.Error as err:
+            return {"status":"error", "error_message": f"{err}"}
   
     
    

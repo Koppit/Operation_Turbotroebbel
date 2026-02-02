@@ -64,11 +64,13 @@ class TableCourses:
             - If not found, return {"status":"success","result":[]}.
             - Use parameterized queries to prevent SQL injection.
         """
-        result = self.conn.query(f'SELECT course_id FROM {self.table} WHERE course_title = "{course_title}"')
-        if not result:
-            return {"status":"error", "error_message":"Course not found"}
-        return {"status":"success", "result": [course[0] for course in result]}
-    
+        try:
+            result = self.conn.query(f'SELECT course_id FROM {self.table} WHERE course_title = "{course_title}"')
+            if not result:
+                return {"status":"not_found", "error_message":"Course not found"}
+            return {"status":"success", "result": [course[0] for course in result]}
+        except mysql.connector.Error as err:
+            return {"status":"error", "error_message": f"{err}"}
 
     def get_course_datafields(self) -> dict:
         """
@@ -107,10 +109,13 @@ class TableCourses:
             - If course not found, return {"status":"success","result":{}}.
             - Validate fields and use parameterized queries.
         """
-        result = self.conn.query(f'SELECT {",".join(fields)} FROM {self.table} WHERE course_id = "{course_id}"')
-        if not result:
-            return {"status":"error", "error_message":"Course not found"}
-        return {"status":"success", "result": dict(zip(fields,result[0]))}
+        try:
+            result = self.conn.query(f'SELECT {",".join(fields)} FROM {self.table} WHERE course_id = "{course_id}"')
+            if not result:
+                return {"status":"not_found", "error_message":"Course not found"}
+            return {"status":"success", "result": dict(zip(fields,result[0]))}
+        except mysql.connector.Error as err:
+            return {"status":"error", "error_message": f"{err}"}
     
 if __name__ == "__main__":
 

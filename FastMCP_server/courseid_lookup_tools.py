@@ -26,10 +26,13 @@ class TableStudyCoursesLookup:
         Notes:
             - Use parameterized queries to avoid SQL injection.
         """
-        results = self.conn.query(f"SELECT DISTINCT course_id FROM {self.table} WHERE study_title = '{study_title}'")
-        if not results:
-            return {"status":"error", "error_message":"Study program not found"}
-        return {"status":"success", "result": [result[0] for result in results]}
+        try:
+            results = self.conn.query(f"SELECT DISTINCT course_id FROM {self.table} WHERE study_title = '{study_title}'")
+            if not results:
+                return {"status":"not_found", "error_message":"Study program not found"}
+            return {"status":"success", "result": [result[0] for result in results]}
+        except mysql.connector.Error as err:
+            return {"status":"error", "error_message": f"{err}"}
     
    
     

@@ -76,10 +76,13 @@ class TableStudyPrograms:
             - Validate 'category' is a non-empty string.
             - Use parameterized queries to avoid SQL injection.
         """
-        result = self.conn.query(f'SELECT study_title FROM {self.table} WHERE study_category = "{category}"')
-        if not result:
-            return {"status":"error", "error_message":"Category not found"}
-        return {"status":"success", "result": [title[0] for title in result]}
+        try:
+            result = self.conn.query(f'SELECT study_title FROM {self.table} WHERE study_category = "{category}"')
+            if not result:
+                return {"status":"not_found", "error_message":"Category not found"}
+            return {"status":"success", "result": [title[0] for title in result]}
+        except mysql.connector.Error as err:
+            return {"status":"error", "error_message":f"{err}"}
     
 
     def get_study_programs_names(self) -> dict:
@@ -148,10 +151,13 @@ class TableStudyPrograms:
             - If the program is not found, return {"status":"success","result":{}}.
             - Validate field names and use parameterized queries to prevent SQL injection.
         """
-        result = self.conn.query(f'SELECT {",".join(fields)} FROM {self.table} WHERE study_title = "{program_name}"')
-        if not result:
-            return {"status":"error", "error_message":"Study program not found"}
-        return {"status":"success", "result": dict(zip(fields,result[0]))}
+        try:
+            result = self.conn.query(f'SELECT {",".join(fields)} FROM {self.table} WHERE study_title = "{program_name}"')
+            if not result:
+                return {"status":"not_found", "error_message":"Datafields not found"}
+            return {"status":"success", "result": dict(zip(fields,result[0]))}
+        except mysql.connector.Error as err:
+            return {"status":"error", "error_message":f"{err}"}
     
     
 if __name__ == "__main__":
@@ -168,8 +174,7 @@ if __name__ == "__main__":
         #results = programs.get_category_study_programs("Helse")
         #results = programs.get_study_programs_names()
         #results = programs.get_study_program_datafields()
-        results = programs.get_study_program_datafields_values("Akuttgeriatri", ["location_id", "credits"])
-        
+        results = programs.get_study_program_datafields_values("Intensivpleie", ["credits"])
         print(results)
 
     except mysql.connector.Error as err:
