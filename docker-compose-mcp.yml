@@ -9,9 +9,7 @@ services:
       MYSQL_PASSWORD: admin
     ports:
       - "3306:3306"
-      - "33060:33060"
-      - "33061:33061"
-      - "33062:33062"
+      - "33060:33060"  # MySQL X Protocol
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:

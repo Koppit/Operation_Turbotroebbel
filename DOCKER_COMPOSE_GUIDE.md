@@ -20,19 +20,19 @@ This configuration runs the web scraping pipeline that:
 **Usage:**
 ```bash
 # Start the scraping pipeline
-docker-compose -f docker-compose-scraping.yml up
+docker compose -f docker-compose-scraping.yml up
 
 # Run in detached mode
-docker-compose -f docker-compose-scraping.yml up -d
+docker compose -f docker-compose-scraping.yml up -d
 
 # View logs
-docker-compose -f docker-compose-scraping.yml logs -f
+docker compose -f docker-compose-scraping.yml logs -f
 
 # Stop and remove containers
-docker-compose -f docker-compose-scraping.yml down
+docker compose -f docker-compose-scraping.yml down
 
 # Stop and remove containers with volumes (deletes database)
-docker-compose -f docker-compose-scraping.yml down -v
+docker compose -f docker-compose-scraping.yml down -v
 ```
 
 **Output:**
@@ -63,20 +63,20 @@ This configuration runs the MCP server and ADK agent that:
 **Usage:**
 ```bash
 # Start MCP server and agent
-docker-compose -f docker-compose-mcp.yml up
+docker compose -f docker-compose-mcp.yml up
 
 # Run in detached mode
-docker-compose -f docker-compose-mcp.yml up -d
+docker compose -f docker-compose-mcp.yml up -d
 
 # Interact with the agent (requires tty)
-docker-compose -f docker-compose-mcp.yml run adk_agent
+docker compose -f docker-compose-mcp.yml run adk_agent
 
 # View logs
-docker-compose -f docker-compose-mcp.yml logs -f mcp_server
-docker-compose -f docker-compose-mcp.yml logs -f adk_agent
+docker compose -f docker-compose-mcp.yml logs -f mcp_server
+docker compose -f docker-compose-mcp.yml logs -f adk_agent
 
 # Stop and remove containers
-docker-compose -f docker-compose-mcp.yml down
+docker compose -f docker-compose-mcp.yml down
 ```
 
 **Accessing services:**
@@ -91,10 +91,10 @@ To run the entire system from scratch:
 
 ```bash
 # Start and run the scraper
-docker-compose -f docker-compose-scraping.yml up
+docker compose -f docker-compose-scraping.yml up
 
 # Wait for the scraper to complete, then stop
-docker-compose -f docker-compose-scraping.yml down
+docker compose -f docker-compose-scraping.yml down
 ```
 
 ### Step 2: Start MCP Server and Agent
@@ -105,7 +105,7 @@ cp .env.example .env
 # Edit .env and set your GOOGLE_API_KEY
 
 # Start MCP server and agent
-docker-compose -f docker-compose-mcp.yml up
+docker compose -f docker-compose-mcp.yml up
 ```
 
 ## Database Configuration
@@ -141,17 +141,17 @@ If services cannot connect to the database:
 
 1. Check that the database is healthy:
    ```bash
-   docker-compose -f docker-compose-mcp.yml ps
+   docker compose -f docker-compose-mcp.yml ps
    ```
 
 2. Check database logs:
    ```bash
-   docker-compose -f docker-compose-mcp.yml logs db
+   docker compose -f docker-compose-mcp.yml logs db
    ```
 
 3. Verify database is accepting connections:
    ```bash
-   docker-compose -f docker-compose-mcp.yml exec db mysqladmin ping -uroot -padmin
+   docker compose -f docker-compose-mcp.yml exec db mysqladmin ping -uroot -padmin
    ```
 
 ### MCP Server Connection Issues
@@ -160,12 +160,12 @@ If the agent cannot connect to the MCP server:
 
 1. Check MCP server is running:
    ```bash
-   docker-compose -f docker-compose-mcp.yml ps mcp_server
+   docker compose -f docker-compose-mcp.yml ps mcp_server
    ```
 
 2. Check MCP server logs:
    ```bash
-   docker-compose -f docker-compose-mcp.yml logs mcp_server
+   docker compose -f docker-compose-mcp.yml logs mcp_server
    ```
 
 3. Test MCP server endpoint:
@@ -179,11 +179,11 @@ If you make changes to code or Dockerfiles:
 
 ```bash
 # Rebuild images
-docker-compose -f docker-compose-scraping.yml build
-docker-compose -f docker-compose-mcp.yml build
+docker compose -f docker-compose-scraping.yml build
+docker compose -f docker-compose-mcp.yml build
 
 # Or rebuild and restart
-docker-compose -f docker-compose-mcp.yml up --build
+docker compose -f docker-compose-mcp.yml up --build
 ```
 
 ### Cleaning Up
@@ -192,10 +192,10 @@ To completely remove all containers, networks, and volumes:
 
 ```bash
 # For scraping pipeline
-docker-compose -f docker-compose-scraping.yml down -v
+docker compose -f docker-compose-scraping.yml down -v
 
 # For MCP server and agent
-docker-compose -f docker-compose-mcp.yml down -v
+docker compose -f docker-compose-mcp.yml down -v
 ```
 
 ## Development Tips
@@ -206,10 +206,10 @@ You can run specific services:
 
 ```bash
 # Only start the database
-docker-compose -f docker-compose-mcp.yml up db
+docker compose -f docker-compose-mcp.yml up db
 
 # Only start MCP server (database must be running)
-docker-compose -f docker-compose-mcp.yml up mcp_server
+docker compose -f docker-compose-mcp.yml up mcp_server
 ```
 
 ### Accessing Containers
@@ -218,18 +218,18 @@ To get a shell in a running container:
 
 ```bash
 # Access database
-docker-compose -f docker-compose-mcp.yml exec db mysql -uroot -padmin fagskolen
+docker compose -f docker-compose-mcp.yml exec db mysql -uroot -padmin fagskolen
 
 # Access MCP server container
-docker-compose -f docker-compose-mcp.yml exec mcp_server /bin/bash
+docker compose -f docker-compose-mcp.yml exec mcp_server /bin/bash
 ```
 
 ### Viewing Real-time Logs
 
 ```bash
 # All services
-docker-compose -f docker-compose-mcp.yml logs -f
+docker compose -f docker-compose-mcp.yml logs -f
 
 # Specific service
-docker-compose -f docker-compose-mcp.yml logs -f mcp_server
+docker compose -f docker-compose-mcp.yml logs -f mcp_server
 ```
