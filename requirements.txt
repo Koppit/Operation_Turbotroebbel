@@ -1,0 +1,17 @@
+# Python Dependencies for Operation Turbotroebbel Project
+
+# Web Scraping
+beautifulsoup4>=4.12.0
+
+# Data Processing
+pandas>=2.0.0
+
+# Database
+mysql-connector-python>=8.0.0
+
+# MCP Server
+fastmcp>=0.1.0
+
+# Google Agent Development Kit (ADK)
+# For multi-agent system with LLM capabilities
+google-adk>=0.1.0
