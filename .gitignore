@@ -34,6 +34,7 @@ wheels/
 
 # IDE
 .idea/
+.vscode/
 *.swp
 *.swo
 *~
@@ -46,12 +47,25 @@ Thumbs.db
 *.log
 .env
 .env.local
+
+# Development/testing scripts (not needed in production)
 testing_kyd.py
 check_locations.py
 quick_check.py
-my_agent
 scan_course_ids.py
-fagskolen_agent/.adk/session.db
+my_agent
 e-l/
+
+# Scraping output (JSON data files)
 Scraping/json_for_processing/*.json
 Scraping/*.json
+Scraping/studies_urls.json
+
+# Agent session data
+fagskolen_agent/.adk/session.db
+
+# Temporary database files
+*.mwb
+*.mwb.bak
+*.drawio.png
+
