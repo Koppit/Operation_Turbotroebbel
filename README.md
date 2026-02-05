@@ -46,6 +46,23 @@ Informasjon om **emner/kurs**:
 
 ## Installasjon og Oppsett
 
+### Hurtigstart (automatisk setup)
+
+For rask oppsett, bruk det medfølgende setup-skriptet:
+
+```bash
+chmod +x setup.sh
+./setup.sh
+```
+
+Dette vil automatisk:
+- Sjekke at alle nødvendige verktøy er installert (Python 3, Docker, Docker Compose)
+- Installere Python-pakker fra requirements.txt
+- Starte MySQL database med Docker Compose
+- Opprette database-skjema
+
+### Manuell installasjon
+
 ### Forutsetninger
 - Python 3.9+ 
 - Docker og Docker Compose
