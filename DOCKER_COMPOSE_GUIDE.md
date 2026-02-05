@@ -2,6 +2,8 @@
 
 This document describes how to use Docker Compose to run the Fagskolen Viken project components.
 
+**Note:** This guide uses `docker compose` (Docker Compose V2). If you have an older version, use `docker-compose` (with hyphen) instead.
+
 ## Available Docker Compose Configurations
 
 ### 1. Scraping Pipeline (`docker-compose-scraping.yml`)
