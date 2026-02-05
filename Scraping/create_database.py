@@ -2,9 +2,9 @@ import mysql.connector
 from mysql.connector import Error
 import os
 
-HOSTNAME = "127.0.0.1"
-USERNAME = "root"
-PASSWORD = "admin"
+HOSTNAME = os.getenv("DB_HOST", "127.0.0.1")
+USERNAME = os.getenv("DB_USER", "root")
+PASSWORD = os.getenv("DB_PASSWORD", "admin")
 FILENAME = "TurbotroebbelSQL.sql"
 
 def execute_sql_file(filename, connection):

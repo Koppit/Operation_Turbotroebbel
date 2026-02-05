@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  # MySQL Database Service
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    ports:
+      - "3306:3306"
+      - "33060:33060"
+      - "33061:33061"
+      - "33062:33062"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-padmin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - mcp_network
+
+  # MCP Server Service
+  mcp_server:
+    build:
+      context: ./FastMCP_server
+      dockerfile: Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=admin
+      - DB_NAME=fagskolen
+    ports:
+      - "8001:8001"
+    networks:
+      - mcp_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/mcp"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ADK Agent Service
+  adk_agent:
+    build:
+      context: ./fagskolen_agent
+      dockerfile: Dockerfile
+    depends_on:
+      mcp_server:
+        condition: service_healthy
+    environment:
+      - MCP_SERVER=http://mcp_server:8001/mcp
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+    networks:
+      - mcp_network
+    stdin_open: true
+    tty: true
+
+volumes:
+  db_data:
+
+networks:
+  mcp_network:
+    driver: bridge

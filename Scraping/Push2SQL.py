@@ -36,9 +36,9 @@ except Exception as e:  # pragma: no cover - user will install if missing
     print("Missing mysql connector. Install with: pip install mysql-connector-python")
     raise
 
-HOSTNAME = "127.0.0.1"
-USERNAME = "root"
-PASSWORD = "admin"
+HOSTNAME = os.getenv("DB_HOST", "127.0.0.1")
+USERNAME = os.getenv("DB_USER", "root")
+PASSWORD = os.getenv("DB_PASSWORD", "admin")
 
 def find_config_candidates(base_dir: str) -> List[str]:
     return [
