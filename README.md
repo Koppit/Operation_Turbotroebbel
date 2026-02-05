@@ -7,7 +7,7 @@ Et KI-basert program som har kunnskap om alle studiene ved Fagskolen i Viken. Pr
 **High level beskrivelse:**
 ![alt text](Images/image.png)
 
-**Eksempel på agent work flow:**
+**Eksempel på agent workflow:**
 ![alt text](Images/image-1.png)
 
 ## Systemarkitektur
@@ -63,12 +63,14 @@ Dette vil automatisk:
 
 ### Manuell installasjon
 
-### Forutsetninger
+Hvis du foretrekker å sette opp alt manuelt, følg stegene nedenfor.
+
+#### Forutsetninger
 - Python 3.9+ 
 - Docker og Docker Compose
 - Git
 
-### 1. Installer Python-pakker
+#### 1. Installer Python-pakker
 
 ```bash
 pip install -r requirements.txt
@@ -76,7 +78,7 @@ pip install -r requirements.txt
 
 Se [DEPENDENCIES.md](DEPENDENCIES.md) for fullstendig liste over avhengigheter.
 
-### 2. Start MySQL Database
+#### 2. Start MySQL Database
 
 ```bash
 cd MySQL
@@ -90,7 +92,7 @@ Standard database-innstillinger:
 - **User:** admin
 - **Password:** admin
 
-### 3. Initialiser Database
+#### 3. Initialiser Database
 
 ```bash
 cd Scraping
