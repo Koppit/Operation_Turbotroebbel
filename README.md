@@ -53,6 +53,11 @@ For enkel oppsett med Docker Compose, se [DOCKER_COMPOSE_GUIDE.md](DOCKER_COMPOS
 **Kjapp start:**
 
 ```bash
+# 0. Start MySQL database først
+cd MySQL
+docker compose up -d
+cd ..
+
 # 1. Kjør scraping pipeline
 docker compose -f docker-compose-scraping.yml up
 
