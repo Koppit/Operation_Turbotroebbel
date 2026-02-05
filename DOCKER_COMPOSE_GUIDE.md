@@ -174,7 +174,7 @@ You can override these by setting environment variables in `.env` or modifying t
 
 ## Volume Persistence
 
-- **Database data:** Stored in named volume `mysql_db_data` in the MySQL container (persists between container restarts)
+- **Database data:** Stored in named volume `db_data` in the MySQL container (persists between container restarts)
 - **JSON files:** Mapped to `./Scraping/json_for_processing/` on host
 - **Study URLs:** Mapped to `./Scraping/studies_urls.json` on host
 
