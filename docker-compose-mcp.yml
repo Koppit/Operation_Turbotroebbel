@@ -1,0 +1,42 @@
+services:
+  # MCP Server Service
+  mcp_server:
+    build:
+      context: .
+      dockerfile: FastMCP_server/Dockerfile
+    environment:
+      # Connect to external MySQL container
+      - DB_HOST=fagskolen_mysql
+      - DB_USER=root
+      - DB_PASSWORD=admin
+      - DB_NAME=fagskolen
+    ports:
+      - "8001:8001"
+    networks:
+      - fagskolen_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/mcp"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ADK Agent Service
+  adk_agent:
+    build:
+      context: .
+      dockerfile: fagskolen_agent/Dockerfile
+    depends_on:
+      mcp_server:
+        condition: service_healthy
+    environment:
+      - MCP_SERVER=http://mcp_server:8001/mcp
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+    networks:
+      - fagskolen_network
+    stdin_open: true
+    tty: true
+
+networks:
+  fagskolen_network:
+    name: fagskolen_network
+    external: true

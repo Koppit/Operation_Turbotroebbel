@@ -1,0 +1,40 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# IDEs
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+*.md
+Images/
+
+# MySQL
+MySQL/
+
+# JSON data (will be mounted as volume)
+Scraping/json_for_processing/
+Scraping/studies_urls.json
+
+# Environment
+.env
+.env.local

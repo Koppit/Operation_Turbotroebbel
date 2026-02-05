@@ -46,6 +46,29 @@ Informasjon om **emner/kurs**:
 
 ## Installasjon og Oppsett
 
+### Docker Compose (Anbefalt)
+
+For enkel oppsett med Docker Compose, se [DOCKER_COMPOSE_GUIDE.md](DOCKER_COMPOSE_GUIDE.md).
+
+**Kjapp start:**
+
+```bash
+# 0. Start MySQL database først
+cd MySQL
+docker compose up -d
+cd ..
+
+# 1. Kjør scraping pipeline
+docker compose -f docker-compose-scraping.yml up
+
+# 2. Sett opp miljøvariabler
+cp .env.example .env
+# Rediger .env og legg til din GOOGLE_API_KEY
+
+# 3. Start MCP server og agent
+docker compose -f docker-compose-mcp.yml up
+```
+
 ### Hurtigstart (automatisk setup)
 
 For rask oppsett, bruk det medfølgende setup-skriptet:

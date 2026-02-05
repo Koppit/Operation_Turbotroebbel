@@ -1,0 +1,24 @@
+services:
+  # Scraper Service
+  scraper:
+    build:
+      context: .
+      dockerfile: Scraping/Dockerfile
+    environment:
+      # Connect to external MySQL container
+      - DB_HOST=fagskolen_mysql
+      - DB_USER=root
+      - DB_PASSWORD=admin
+      - DB_NAME=fagskolen
+    volumes:
+      # Mount for JSON output files
+      - ./Scraping/json_for_processing:/app/json_for_processing
+      # Mount for study URLs
+      - ./Scraping/studies_urls.json:/app/studies_urls.json
+    networks:
+      - fagskolen_network
+
+networks:
+  fagskolen_network:
+    name: fagskolen_network
+    external: true
